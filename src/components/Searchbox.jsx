@@ -14,24 +14,26 @@ const Searchbox = () => {
     const [display, setDisplay] = useState(true)
     const [cityName, setCityName] = useState('Indore')
     const [my,setMy]=useState("")
-    
+    const [humadity,setHumadity]=useState("")
+    const Currentlocation = (e) => {
+      axios
+      .get("https://ipinfo.io/json?token=52ed0181817dc8")
+      .then((response) => {
+        setCityName(response.data.city)
+        WeatherFetch(response.data.city)
+        localStorage.setItem('cityName', JSON.stringify(response.data.city))
+      })
+    }
     const arr = useRef([])
     // console.log(my)
     useEffect(()=>{
-      const Currentlocation = (e) => {
-        axios
-        .get("https://ipinfo.io/json?token=52ed0181817dc8")
-        .then((response) => {
-          setCityName(response.data.city)
-          WeatherFetch(response.data.city)
-          localStorage.setItem('cityName', JSON.stringify(response.data.city))
-        })
-      }
+      Currentlocation()
       },[])
 
     // console.log(weather)
     const AllDaysData = (latitude,longitude) => {
-      axios.get(`https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&appid=44d2f0f421a5b483b38e2ea12704107e&units=metric`).then((res)=>{
+      axios.get(`https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&appid=44d2f0f421a5b483b38e2ea12704107e&units=metric`)
+      .then((res)=>{
       setWeather(res.data.daily)
       let day = res.data.daily[0].feels_like
            arr.current =  Object.values(day)
@@ -41,10 +43,10 @@ const Searchbox = () => {
          })
        }
 
-    const WeatherFetch = (name) => {
+    const WeatherFetch = (cityname) => {
       let longitude; 
       let latitude;
-      axios.get(`https://api.openweathermap.org/data/2.5/forecast?q=${name}&cnt=7&appid=5c6004fc3786d57b9d23c346916d72e5&units=metric`).then((res)=>{
+      axios.get(`https://api.openweathermap.org/data/2.5/forecast?q=${cityname}&cnt=7&appid=5c6004fc3786d57b9d23c346916d72e5&units=metric`).then((res)=>{
         longitude = res.data.city.coord.lon
         latitude = res.data.city.coord.lat
        
@@ -76,15 +78,14 @@ const Searchbox = () => {
         setDisplay(true)
           }
     }
-        
-        const fetchWeather = (el) => {
+         const fetchWeather = (el) => {
           setDisplay(true)
            WeatherFetch(el.city)
           setCityName(el.city)
           localStorage.setItem('cityName', JSON.stringify(el.city))
     }
-   
-  
+   console.log(humadity)
+  console.log(weather)
   return (
   <div className='desktop'>
   <div className='mobile_view'>
@@ -124,6 +125,7 @@ const Searchbox = () => {
                    </div>
                    <img src={`https://openweathermap.org/img/wn/${e.weather[0].icon}.png`} alt="abc"  />
                 <p style={{margin:'0px'}}>{e.weather[0].main}</p>
+                {/* <p>{e.weather[0]}</p> */}
               </div>
             )
           })}
